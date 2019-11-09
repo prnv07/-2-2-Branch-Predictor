@@ -21,14 +21,14 @@
 
 
 module Core(out, mode, inp);
-output out;
+output out; //prediction(output)
 reg out;
-input [1:0] mode;
-input inp;
-reg [1:0] prev_out;
-reg [1:0] out_nn, out_nt, out_tn, out_tt;
+input [1:0] mode; //mode of operation
+input inp; //input to enter true outcome of branch
+reg [1:0] prev_out; //register to store last two outcome(true outcome) of the branch
+reg [1:0] out_nn, out_nt, out_tn, out_tt; //registers to store current FSM state for each of the 4 branch predictors
 
-initial
+initial //initializing registers
 begin
 prev_out  = 2'b00;
 out_nn = 2'b00;
@@ -40,7 +40,7 @@ end
 
 always @(mode[0] or mode[1])
 begin
-    if(mode == 2'b00)
+    if(mode == 2'b00) //operation in PREDICT mode
     begin
         if(prev_out == 2'b00)
         begin
@@ -63,9 +63,9 @@ begin
 //        $display("The prediction is %b", out_tt[1]);
         end
     end
-    else if(mode == 2'b01)
+    else if(mode == 2'b01) // operation in BRANCH mode
     begin
-        
+        //code to index the appropriate BP and change it's FSM state based on enter input(true branch outcome)
         if(prev_out == 2'b00)
         begin
             if(out_nn == 2'b00)
@@ -247,11 +247,11 @@ begin
      prev_out[1] <= prev_out[0];
         prev_out[0] <= inp;   
     end
-    else if(mode == 2'b10)
+    else if(mode == 2'b10) //operation in DISPLAY mode
     begin
         $display("%b, %b, %b, %b", out_nn, out_nt, out_tn, out_tt);
     end
-    else
+    else // operation in RESET mode
     begin
         out_nn = 2'b00;
         out_nt = 2'b00;
