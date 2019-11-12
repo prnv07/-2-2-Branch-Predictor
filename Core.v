@@ -22,7 +22,7 @@
 
 module Core(out, mode, inp);
 output out; //prediction(output)
-reg out;
+reg [7:0] out;
 input [1:0] mode; //mode of operation
 input inp; //input to enter true outcome of branch
 reg [1:0] prev_out; //register to store last two outcome(true outcome) of the branch
@@ -35,7 +35,7 @@ out_nn = 2'b00;
 out_nt = 2'b00;
 out_tn = 2'b11;
 out_tt = 2'b11;
-out = 0;
+out = 8'b11111110;
 end
 
 always @(mode[0] or mode[1])
@@ -44,22 +44,26 @@ begin
     begin
         if(prev_out == 2'b00)
         begin
-        out<= out_nn[1];
+        out[7:1]<= 7'b1111111;
+        out[0]<= out_nn[1];
 //        $display("The prediction is %b", out_nn[1]);
         end
         else if(prev_out == 2'b01)
         begin
-        out<= out_nt[1];
+        out[7:1]<= 7'b1111111;
+        out[0]<= out_nt[1];
 //        $display("The prediction is %b", out_nt[1]);
         end
         else if(prev_out == 2'b10)
         begin
-        out<= out_tn[1];
+        out[7:1]<= 7'b1111111;
+        out[0]<= out_tn[1];
 //        $display("The prediction is %b", out_tn[1]);
         end
         else
         begin
-        out<= out_tt[1];
+        out[7:1]<= 7'b1111111;
+        out[0]<= out_tt[1];
 //        $display("The prediction is %b", out_tt[1]);
         end
     end
@@ -249,7 +253,8 @@ begin
     end
     else if(mode == 2'b10) //operation in DISPLAY mode
     begin
-        $display("%b, %b, %b, %b", out_nn, out_nt, out_tn, out_tt);
+//        $display("%b, %b, %b, %b", out_nn, out_nt, out_tn, out_tt);
+          out = {out_nn, out_nt, out_tn, out_tt};
     end
     else // operation in RESET mode
     begin
